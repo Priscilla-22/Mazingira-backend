@@ -11,7 +11,6 @@ app = Flask(__name__)
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mazingira.db'
 app.config['SECRET_KEY'] = 'your_secret_key'
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 db = SQLAlchemy(app)
 
 # Database Models
