@@ -36,7 +36,7 @@ class Organization(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     image_url = db.Column(db.String(255))
-    learn_more = db.Column(db.String(255))
+    description = db.Column(db.String(255))
 
 class Donation(db.Model):
     __tablename__ = 'donations'
@@ -65,6 +65,8 @@ class Story(db.Model):
 
 # User Registration
 @app.route('/api/register', methods=['POST'])
+@cross_origin(origins="*", supports_credentials=True)
+
 def register():
     data = request.get_json()
     email = data.get('email')
@@ -138,7 +140,7 @@ def token_required(f):
 @app.route('/api/organizations', methods=['GET'])
 def get_organizations():
     organizations = Organization.query.all()
-    result = [{'id': org.id, 'name': org.name, 'image_url': org.image_url, 'learn_more': org.learn_more} for org in organizations]
+    result = [{'id': org.id, 'name': org.name, 'image_url': org.image_url, 'learn_more': org.description} for org in organizations]
     return jsonify(result)
 
 # Donate
