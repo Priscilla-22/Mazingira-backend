@@ -4,10 +4,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from functools import wraps
 import datetime
+from flask_cors import CORS, cross_origin
+
 
 app = Flask(__name__)
+CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mazingira.db'
 app.config['SECRET_KEY'] = 'your_secret_key'
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 db = SQLAlchemy(app)
 
 # Database Models
@@ -18,6 +22,8 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     role = db.Column(db.String(20), nullable=False)  # Roles: 'donor', 'organization', 'administrator'
+    first_name = db.Column(db.String(120), nullable=False)
+    last_name =  db.Column(db.String(120), nullable=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -65,6 +71,9 @@ def register():
     email = data.get('email')
     password = data.get('password')
     role = data.get('role')
+    first_name = data.get('first_name')
+    last_name= data.get("last_name")
+
 
     if not email or not password or not role:
         return jsonify({'message': 'Missing required fields'}), 400
@@ -74,7 +83,7 @@ def register():
         return jsonify({'message': 'Email already exists'}), 409
 
     # Create a new user
-    new_user = User(email=email, role=role)
+    new_user = User(email=email, role=role, first_name=first_name, last_name=last_name)
     new_user.set_password(password)
 
     db.session.add(new_user)
@@ -85,6 +94,7 @@ def register():
 
 # User Login
 @app.route('/api/login', methods=['POST'])
+@cross_origin(origins="*", supports_credentials=True)
 def login():
     data = request.get_json()
     email = data.get('email')
